@@ -1,64 +1,137 @@
 import logging
 import os
-import sqlite3 as sqlite
-import threading
-
+# import sqlite3 as sqlite
+import pymysql
 
 class Store:
     database: str
 
-    def __init__(self, db_path):
-        self.database = os.path.join(db_path, "be.db")
+    def __init__(self):
+        # self.database = os.path.join(db_path, "be.db")
+        # self.init_tables()
+        # self.connection = pymysql.connect(
+        #     host='127.0.0.1',
+        #     user='root',
+        #     password='zwx870504'
+        #     # database='bookstore'
+        # )
+        # try:
+        #     # 创建一个新的数据库
+        #     with self.connection.cursor() as cursor:
+        #         sql = "CREATE DATABASE bookstore"
+        #         cursor.execute(sql)
+        #
+        #     # 提交更改
+        #     self.connection.commit()
+        #     print("已经成功创建")
+        #
+        # except pymysql.Error as e:
+        #     print(f"创建数据库时发生错误: {e}")
+
+        self.database = pymysql.connect(
+            host='127.0.0.1',
+            user='root',
+            password='zwx870504',
+            database='bookstore'
+        )
         self.init_tables()
 
     def init_tables(self):
         try:
             conn = self.get_db_conn()
-            conn.execute(
+            cursor = conn.cursor()
+            cursor.execute(
                 "CREATE TABLE IF NOT EXISTS user ("
-                "user_id TEXT PRIMARY KEY, password TEXT NOT NULL, "
-                "balance INTEGER NOT NULL, token TEXT, terminal TEXT);"
+                "user_id VARCHAR(255) PRIMARY KEY, password VARCHAR(255) NOT NULL, "
+                "balance INTEGER NOT NULL, token TEXT, terminal VARCHAR(255));"
             )
 
-            conn.execute(
+            cursor.execute(
                 "CREATE TABLE IF NOT EXISTS user_store("
-                "user_id TEXT, store_id, PRIMARY KEY(user_id, store_id));"
+                "user_id VARCHAR(255), store_id VARCHAR(255), PRIMARY KEY(user_id, store_id));"
             )
 
-            conn.execute(
-                "CREATE TABLE IF NOT EXISTS store( "
-                "store_id TEXT, book_id TEXT, book_info TEXT, stock_level INTEGER,"
-                " PRIMARY KEY(store_id, book_id))"
+            # conn.execute(
+            #     "CREATE TABLE IF NOT EXISTS store( "
+            #     "store_id TEXT, book_id TEXT, book_info TEXT, stock_level INTEGER,"
+            #     " PRIMARY KEY(store_id, book_id))"
+            # )
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS store(
+                    store_id VARCHAR(255),
+                    book_id VARCHAR(255),
+                    tags VARCHAR(255),
+                    book_info LONGTEXT,
+                    pictures BLOB,
+                    id VARCHAR(255),
+                    title VARCHAR(255),
+                    author VARCHAR(255),
+                    publisher VARCHAR(255),
+                    original_title VARCHAR(255),
+                    translator VARCHAR(255),
+                    pub_year VARCHAR(255),
+                    pages INTEGER,
+                    price INTEGER,
+                    binding VARCHAR(255),
+                    isbn VARCHAR(255),
+                    author_intro VARCHAR(255),
+                    book_intro VARCHAR(255),
+                    content TEXT,
+                    stock_level INTEGER,
+                    PRIMARY KEY (store_id, book_id)
+                    )
+                """
             )
 
-            conn.execute(
-                "CREATE TABLE IF NOT EXISTS new_order( "
-                "order_id TEXT PRIMARY KEY, user_id TEXT, store_id TEXT)"
+            # conn.execute(
+            #     "CREATE TABLE IF NOT EXISTS new_order( "
+            #     "order_id TEXT PRIMARY KEY, user_id TEXT, store_id TEXT)"
+            # )
+            #
+            # conn.execute(
+            #     "CREATE TABLE IF NOT EXISTS new_order_detail( "
+            #     "order_id TEXT, book_id TEXT, count INTEGER, price INTEGER,  "
+            #     "PRIMARY KEY(order_id, book_id))"
+            # )
+            cursor.execute(
+                "CREATE TABLE IF NOT EXISTS new_order ("
+                "order_id VARCHAR(255) PRIMARY KEY, "
+                "store_id VARCHAR(255), "
+                "user_id VARCHAR(255), "
+                "book_status INTEGER, "
+                "order_time DATETIME)"
             )
 
-            conn.execute(
+            cursor.execute(
                 "CREATE TABLE IF NOT EXISTS new_order_detail( "
-                "order_id TEXT, book_id TEXT, count INTEGER, price INTEGER,  "
+                "order_id VARCHAR(255), book_id VARCHAR(255), count INTEGER, price INTEGER,  "
                 "PRIMARY KEY(order_id, book_id))"
             )
 
+            cursor.execute(
+                "CREATE TABLE IF NOT EXISTS new_order_paid( "
+                "order_id VARCHAR(255), store_id VARCHAR(255), user_id VARCHAR(255), "
+                "book_status INTEGER, price INTEGER, "
+                "PRIMARY KEY(order_id, user_id))"
+            )
+
             conn.commit()
-        except sqlite.Error as e:
-            logging.error(e)
-            conn.rollback()
-
-    def get_db_conn(self) -> sqlite.Connection:
-        return sqlite.connect(self.database)
+        finally:
+            if cursor:
+                cursor.close()
 
 
-database_instance: Store = None
-# global variable for database sync
-init_completed_event = threading.Event()
+    def get_db_conn(self) -> pymysql.connections.Connection:
+        return self.database
 
 
-def init_database(db_path):
+database_instance = Store()
+
+
+def init_database():
     global database_instance
-    database_instance = Store(db_path)
+    database_instance = Store()
 
 
 def get_db_conn():
