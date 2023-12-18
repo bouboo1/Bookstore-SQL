@@ -3,30 +3,11 @@ import os
 # import sqlite3 as sqlite
 import pymysql
 
+
 class Store:
     database: str
 
     def __init__(self):
-        # self.database = os.path.join(db_path, "be.db")
-        # self.init_tables()
-        # self.connection = pymysql.connect(
-        #     host='127.0.0.1',
-        #     user='root',
-        #     password='zwx870504'
-        #     # database='bookstore'
-        # )
-        # try:
-        #     # 创建一个新的数据库
-        #     with self.connection.cursor() as cursor:
-        #         sql = "CREATE DATABASE bookstore"
-        #         cursor.execute(sql)
-        #
-        #     # 提交更改
-        #     self.connection.commit()
-        #     print("已经成功创建")
-        #
-        # except pymysql.Error as e:
-        #     print(f"创建数据库时发生错误: {e}")
 
         self.database = pymysql.connect(
             host='127.0.0.1',

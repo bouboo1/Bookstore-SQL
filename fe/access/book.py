@@ -15,7 +15,6 @@ class Book:
     pub_year: str
     pages: int
     price: int
-    currency_unit: str
     binding: str
     isbn: str
     author_intro: str
@@ -33,9 +32,9 @@ class BookDB:
     def __init__(self, large: bool = False):
         parent_path = os.path.dirname(os.path.dirname(__file__))
         self.db_s = os.path.join(parent_path, "data/book.db")
-        self.db_l = os.path.join(parent_path, "data/book_lx.db")
+        # self.db_l = os.path.join(parent_path, "data/book_lx.db")
         if large:
-            self.book_db = self.db_l
+            self.book_db = self.db_s
         else:
             self.book_db = self.db_s
 
@@ -78,15 +77,15 @@ class BookDB:
             book.content = row[14]
             tags = row[15]
 
-            picture = row[16]
+            # picture = row[16]
 
             for tag in tags.split("\n"):
                 if tag.strip() != "":
                     book.tags.append(tag)
-            for i in range(0, random.randint(0, 9)):
-                if picture is not None:
-                    encode_str = base64.b64encode(picture).decode("utf-8")
-                    book.pictures.append(encode_str)
+            # for i in range(0, random.randint(0, 9)):
+            #     if picture is not None:
+            #         encode_str = base64.b64encode(picture).decode("utf-8")
+            #         book.pictures.append(encode_str)
             books.append(book)
             # print(tags.decode('utf-8'))
 
