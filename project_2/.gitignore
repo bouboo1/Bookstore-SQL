@@ -1,8 +1,0 @@
-
-bookstore/fe/data/book_lx.db
-bookstore/.idea
-bookstore/htmlcov
-bookstore/.coverage
-**/__pycache__
-bookstore/be.db
-*.log
