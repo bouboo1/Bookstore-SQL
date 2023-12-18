@@ -9,7 +9,7 @@ from be.view import buyer
 from be.model.store import init_database
 from be.view import search
 from be.view import send_receive
-
+from be.view import order
 
 bp_shutdown = Blueprint("shutdown", __name__)
 
@@ -37,4 +37,5 @@ def be_run():
 
     app.register_blueprint(search.bp_search)
     app.register_blueprint(send_receive.bp_send_receive)
+    app.register_blueprint(order.bp_order)
     app.run(host='127.0.0.1', port=5000)
